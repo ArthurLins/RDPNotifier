@@ -47,18 +47,37 @@ namespace RDPNotifier
                     var inUse = CurrentUserIsInTS(out var session);
                     if (CurrentUser == null && inUse)
                     {
-                        CurrentUser = session.ClientName;
-                        HookService.OnConnect(CurrentUser, Environment.UserName);
+                        Connect(session.ClientName);
                     }
                     else if (CurrentUser != null && !inUse)
-                    {                    
-                        HookService.OnDisconnect(CurrentUser, Environment.UserName);
-                        CurrentUser = null;
+                    {
+                        Disconnect(CurrentUser);
                     }
-                    await Task.Delay(1000);
+                    else if (CurrentUser != null && inUse)
+                    {
+                        if (!session.ClientName.Equals(CurrentUser, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Disconnect(CurrentUser);
+                        }
+                    }
+                    await Task.Delay(100);
                 }
             });
         }
+
+
+        private static void Connect(string id)
+        {
+            CurrentUser = id;
+            HookService.OnConnect(id, Environment.UserName);
+        }
+
+        private static void Disconnect(string id)
+        {
+            HookService.OnDisconnect(id, Environment.UserName);
+            CurrentUser = null;
+        }
+
         public static bool CurrentUserIsInTS(out ITerminalServicesSession currentSession)
         {
             var tsMgr = new TerminalServicesManager();

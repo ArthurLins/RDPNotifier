@@ -90,7 +90,7 @@ namespace RDPNotifier.Forms
             this.label4.Size = new System.Drawing.Size(133, 100);
             this.label4.TabIndex = 0;
             this.label4.Text = "O acesso foi registrado!\r\nPor favor, preencha as informações ao lado para melhora" +
-    "r a exebição no discord.";
+    "r a exibição no discord.";
             // 
             // clientIdLabel
             // 

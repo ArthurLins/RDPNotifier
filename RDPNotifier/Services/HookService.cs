@@ -54,7 +54,7 @@ namespace RDPNotifier.Services
             {
                 return;
             }
-            var msg = Message("Entrou no Servidor", $"Id: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}>", 7732992);
+            var msg = Message("Entrou no servidor", $"Id: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}>", 7732992);
             Debug.WriteLine(msg);
             var content = new StringContent(msg, Encoding.UTF8, "application/json");
             Client.PostAsync(DiscordHookForm.HookUrl, content);
@@ -65,7 +65,7 @@ namespace RDPNotifier.Services
             {
                 return;
             }
-            var msg = Message("Saiu no Servidor", $"Id: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}>", 16711680);
+            var msg = Message("Saiu do servidor", $"Id: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}>", 16711680);
             var content = new StringContent(msg, Encoding.UTF8, "application/json");
             Client.PostAsync(DiscordHookForm.HookUrl, content);
         }

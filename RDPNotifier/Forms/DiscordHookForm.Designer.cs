@@ -35,6 +35,7 @@ namespace RDPNotifier
             this.discordLink = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -68,6 +69,11 @@ namespace RDPNotifier
             this.notifyIcon1.Text = "RDPNotifier";
             this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // DiscordHookForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -95,6 +101,7 @@ namespace RDPNotifier
         private System.Windows.Forms.TextBox discordLink;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

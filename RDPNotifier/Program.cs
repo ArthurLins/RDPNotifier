@@ -34,35 +34,34 @@ namespace RDPNotifier
                 var users = db.GetCollection<User>("users");
                 RegisterDialog = new RegisterDialog(users);
                 HookService = new HookService(users, RegisterDialog);
-                ListenSession();
                 Application.Run(DiscordHookForm);
             }
         }
-        public static void ListenSession()
+        public static void ListenSessionTick()
         {
-            Task.Factory.StartNew(async () =>
+            try
             {
-                while (true)
+                var inUse = CurrentUserIsInTS(out var session);
+                if (CurrentUser == null && inUse)
                 {
-                    var inUse = CurrentUserIsInTS(out var session);
-                    if (CurrentUser == null && inUse)
-                    {
-                        Connect(session.ClientName);
-                    }
-                    else if (CurrentUser != null && !inUse)
+                    Connect(session.ClientName);
+                }
+                else if (CurrentUser != null && !inUse)
+                {
+                    Disconnect(CurrentUser);
+                }
+                else if (CurrentUser != null && inUse)
+                {
+                    if (!session.ClientName.Equals(CurrentUser, StringComparison.OrdinalIgnoreCase))
                     {
                         Disconnect(CurrentUser);
                     }
-                    else if (CurrentUser != null && inUse)
-                    {
-                        if (!session.ClientName.Equals(CurrentUser, StringComparison.OrdinalIgnoreCase))
-                        {
-                            Disconnect(CurrentUser);
-                        }
-                    }
-                    await Task.Delay(100);
                 }
-            });
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
 

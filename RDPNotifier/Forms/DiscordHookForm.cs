@@ -19,6 +19,7 @@ namespace RDPNotifier
     public partial class DiscordHookForm : Form
     {
         public static string HookUrl { get; set; } = null;
+        public static int IdleTimeout { get; set; } = 0;
 
         private ILiteCollection<HookUrl> Hooks;
 
@@ -30,13 +31,15 @@ namespace RDPNotifier
             if (hook != null)
             {
                 HookUrl = hook.Url;
+                IdleTimeout = hook.Idle;
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Hooks.Upsert(1, new HookUrl { Url = discordLink.Text });
             HookUrl = discordLink.Text;
+            IdleTimeout = decimal.ToInt32(idleMinutes.Value);
+            Hooks.Upsert(1, new HookUrl { Url = HookUrl, Idle = IdleTimeout });
             HideForm();
         }
 
@@ -58,6 +61,7 @@ namespace RDPNotifier
             if (HookUrl != null)
             {
                 discordLink.Text = HookUrl;
+                idleMinutes.Value = IdleTimeout;
                 HideForm();
                 Hide();
             }
@@ -66,6 +70,11 @@ namespace RDPNotifier
         private void timer1_Tick(object sender, EventArgs e)
         {
             Program.ListenSessionTick();
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://github.com/ArthurLins/RDPNotifier");
         }
     }
 }

@@ -125,6 +125,7 @@
     <Compile Include="Services\HookService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\SystemService.cs" />
     <EmbeddedResource Include="Forms\DiscordHookForm.resx">
       <DependentUpon>DiscordHookForm.cs</DependentUpon>
     </EmbeddedResource>

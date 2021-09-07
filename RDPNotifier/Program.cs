@@ -18,7 +18,10 @@ namespace RDPNotifier
         private static RegisterDialog RegisterDialog;
         private static DiscordHookForm DiscordHookForm;
         private static HookService HookService;
+        private static int idleDiff = 0;
         public static string CurrentUser = null;
+
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -41,7 +44,8 @@ namespace RDPNotifier
         {
             try
             {
-                var inUse = CurrentUserIsInTS(out var session);
+                //Access Detection
+                var inUse = SystemService.CurrentUserIsInTS(out var session);
                 if (CurrentUser == null && inUse)
                 {
                     Connect(session.ClientName);
@@ -54,9 +58,30 @@ namespace RDPNotifier
                 {
                     if (!session.ClientName.Equals(CurrentUser, StringComparison.OrdinalIgnoreCase))
                     {
+
                         Disconnect(CurrentUser);
                     }
                 }
+
+                //Idle detection        
+                if (inUse && DiscordHookForm.IdleTimeout > 0 && CurrentUser != null)
+                {
+                    SystemService.CursorTick();
+                    var time = SystemService.GetCursorIdleTime();
+                    var diff = CalculateIdleDiff(time);
+                    if (diff != idleDiff)
+                    {
+                        if (diff == 0 && idleDiff > 0)
+                        {
+                            //Resume
+                            idleDiff = 0;
+                            return;
+                        }
+                        idleDiff = diff;
+                        Idle(CurrentUser, time);
+                    }
+                }
+
             }
             catch (Exception)
             {
@@ -64,37 +89,28 @@ namespace RDPNotifier
             }
         }
 
+        private static int CalculateIdleDiff(TimeSpan time)
+        {
+            return (int)Math.Floor(time.TotalMilliseconds / (DiscordHookForm.IdleTimeout  * 60 * 1000f));
+        }
 
         private static void Connect(string id)
         {
+            SystemService.ResetTimer();
             CurrentUser = id;
             HookService.OnConnect(id, Environment.UserName);
         }
 
         private static void Disconnect(string id)
         {
+            SystemService.ResetTimer();
             HookService.OnDisconnect(id, Environment.UserName);
             CurrentUser = null;
         }
 
-        public static bool CurrentUserIsInTS(out ITerminalServicesSession currentSession)
+        private static void Idle(string id, TimeSpan timeSpan)
         {
-            var tsMgr = new TerminalServicesManager();
-            var localSvr = tsMgr.GetLocalServer();
-            var sessions = localSvr.GetSessions();
-            foreach (var session in sessions)
-            {
-                if (!Environment.UserName.Equals(session.UserName, StringComparison.OrdinalIgnoreCase)) continue;
-
-                if (session.ConnectionState == ConnectionState.Active ||
-                   session.ConnectionState == ConnectionState.Connected)
-                {
-                    currentSession = session;
-                    return true;
-                }
-            }
-            currentSession = null;
-            return false;
+            HookService.OnUserIdle(id, Environment.UserName, timeSpan);
         }
     }
 }

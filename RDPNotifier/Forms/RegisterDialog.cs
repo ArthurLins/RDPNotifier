@@ -24,6 +24,10 @@ namespace RDPNotifier.Forms
 
         public void ShowForm(string clientId)
         {
+            if (clientId == "" || clientId == null)
+            {
+                return;
+            }
             Task.Factory.StartNew(() =>
             {
                 ClientId = clientId;

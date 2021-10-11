@@ -59,6 +59,16 @@ namespace RDPNotifier.Services
             SendIdleWebhook(clientId, currentUser, $"{timeSpan:hh\\:mm\\:ss}", user.Name, user.DiscordId);
         }
 
+        public void OnUserResume(string clientId, string currentUser)
+        {
+            var user = Users.FindById(clientId);
+            if (user is null)
+            {
+                SendResumeWebhook(clientId, currentUser);
+                return;
+            }
+            SendResumeWebhook(clientId, currentUser, user.Name, user.DiscordId);
+        }
 
         public void SendJoinWebhook(string clientId, string currentUser, string name =null, string discordId = "")
         {
@@ -107,6 +117,22 @@ namespace RDPNotifier.Services
                 return;
             }
             var msg = Message("Ausente no servidor", $"Origem: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}> \\n Tempo ausente: {time ?? ""}", 16705372);
+            var content = new StringContent(msg, Encoding.UTF8, "application/json");
+            Client.PostAsync(DiscordHookForm.HookUrl, content);
+        }
+
+        public void SendResumeWebhook(string clientId, string currentUser, string name = "", string discordId = "")
+        {
+            if (clientId == "" || clientId == null)
+            {
+                //Todo custom message for local access
+                clientId = "Local";
+            }
+            if (DiscordHookForm.HookUrl is null)
+            {
+                return;
+            }
+            var msg = Message("Voltou ao servidor", $"Origem: {clientId} \\n Usuário do servidor: {currentUser} \\n Nome: {name ?? "Não informado"} \\n Discord: <@{discordId ?? ""}>", 15418782);
             var content = new StringContent(msg, Encoding.UTF8, "application/json");
             Client.PostAsync(DiscordHookForm.HookUrl, content);
         }

@@ -75,6 +75,7 @@ namespace RDPNotifier
                         {
                             //Resume
                             idleDiff = 0;
+                            Resume(CurrentUser);
                             return;
                         }
                         idleDiff = diff;
@@ -111,6 +112,10 @@ namespace RDPNotifier
         private static void Idle(string id, TimeSpan timeSpan)
         {
             HookService.OnUserIdle(id, Environment.UserName, timeSpan);
+        }
+        private static void Resume(string id)
+        {
+            HookService.OnUserResume(id, Environment.UserName);
         }
     }
 }
